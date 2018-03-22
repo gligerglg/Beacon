@@ -7,63 +7,71 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
+
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 public class Tarrif extends AppCompatActivity {
 
-    String[] categories = {"Domestic","Religious","General","Hotel","Industrial"};
-    private MaterialBetterSpinner spinner;
     private EditText txt_units;
     private Button btn_done;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private ConstraintLayout layout;
+    private RadioGroup radioGroup;
+    private RadioButton radioButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tarrif);
 
-        spinner = findViewById(R.id.spin_categories);
-        txt_units = findViewById(R.id.txt_units);
-        btn_done = findViewById(R.id.btn_done);
-        layout = findViewById(R.id.layout_teriff);
-        sharedPreferences = getSharedPreferences("beacon_settings",0);
-        editor = sharedPreferences.edit();
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,categories);
-        spinner.setAdapter(arrayAdapter);
-
-
+        Init();
         btn_done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Verification
-                if(spinner.getText().toString().isEmpty())
-                    setMessage("Select a Consumer Category");
+               radioButton = findViewById(radioGroup.getCheckedRadioButtonId());
                 if(txt_units.getText().toString().isEmpty())
-                    setMessage("Set a Limit");
+                    setMessage("Set a Power Consumption Threshold Limit");
 
                 //Save in Preferences
-                if(!spinner.getText().toString().isEmpty() && !txt_units.getText().toString().isEmpty()){
-                    editor.putString("category",spinner.getText().toString());
+                if(!txt_units.getText().toString().isEmpty()){
+                    editor.putString("category",radioButton.getText().toString());
                     editor.putInt("threshold",Integer.parseInt(txt_units.getText().toString()));
+                    editor.putBoolean("teriff_set",true);
                     editor.commit();
+                    startActivity(new Intent(getApplicationContext(),MainActivity.class));
                 }
 
-                startActivity(new Intent(getApplicationContext(),MainActivity.class));
             }
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
+    }
+
     private void setMessage(String message)
     {
-        Snackbar snackbar = Snackbar.make(layout,message,Snackbar.LENGTH_SHORT);
+        Snackbar snackbar = Snackbar.make(layout,message,Snackbar.LENGTH_LONG);
         snackbar.show();
+    }
+
+    private void Init(){
+        getSupportActionBar().hide();
+        txt_units = findViewById(R.id.txt_units);
+        btn_done = findViewById(R.id.btn_done);
+        layout = findViewById(R.id.layout_teriff);
+        radioGroup = findViewById(R.id.radio_category);
+        radioButton = findViewById(R.id.radio_domestic);
+        sharedPreferences = getSharedPreferences("beacon_settings",0);
+        editor = sharedPreferences.edit();
+
+        radioButton.setChecked(true);
     }
 }
