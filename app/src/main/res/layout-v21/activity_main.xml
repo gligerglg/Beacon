@@ -7,7 +7,7 @@
     android:weightSum="10"
     android:orientation="vertical"
     tools:context="apps.gligerglg.beacon.MainActivity"
-    android:background="@color/windowBackground">
+    android:background="@color/colorPrimary">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -18,8 +18,8 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -31,9 +31,9 @@
 
             <TextView
                 android:id="@+id/txt_no_unit"
-                android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
                 android:text="00"
                 android:textColor="@color/colorAccent"
                 android:textSize="50dp" />
@@ -42,43 +42,44 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:textSize="15sp"
+                android:text="Units"
                 android:textColor="@color/colorAccent"
-                android:text="Units" />
+                android:textSize="15sp" />
         </LinearLayout>
 
         <ImageView
             android:id="@+id/img_beacon"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="20dp"
             android:src="@drawable/beacon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
 
-    <GridLayout
+    <android.support.v7.widget.GridLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
-        android:columnCount="2"
-        android:rowCount="2"
-        android:alignmentMode="alignMargins"
-        android:columnOrderPreserved="false"
-        android:padding="10dp">
+        android:padding="10dp"
+        app:rowCount="2"
+        app:columnCount="2"
+        app:alignmentMode="alignMargins"
+        app:columnOrderPreserved="false">
 
         <android.support.v7.widget.CardView
+            android:id="@+id/btn_meter_reader"
             android:layout_height="0dp"
             android:layout_width="0dp"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
             android:backgroundTint="@color/windowBackground"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="5dp"
-            app:cardElevation="10dp">
+            app:cardElevation="10dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -89,7 +90,7 @@
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_gravity="center_horizontal"
-                    android:src="@drawable/meter_icon"/>
+                    android:src="@drawable/icon_meter"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -97,21 +98,22 @@
                     android:textStyle="bold"
                     android:layout_marginTop="5dp"
                     android:textAlignment="center"
-                    android:text="Today Meter Reading"/>
+                    android:text="Today\nMeter Reading"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
+            android:id="@+id/btn_summery_usage"
             android:layout_height="0dp"
             android:layout_width="0dp"
             android:backgroundTint="@color/windowBackground"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="5dp"
-            app:cardElevation="10dp">
+            app:cardElevation="10dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -122,7 +124,7 @@
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_gravity="center_horizontal"
-                    android:src="@drawable/graph_icon"/>
+                    android:src="@drawable/icon_graph"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -130,21 +132,22 @@
                     android:textStyle="bold"
                     android:layout_marginTop="5dp"
                     android:textAlignment="center"
-                    android:text="Electricity Usage Summery"/>
+                    android:text="Electricity Usage\nSummery"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
+            android:id="@+id/btn_bill_calculator"
             android:layout_height="0dp"
             android:layout_width="0dp"
             android:backgroundTint="@color/windowBackground"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="5dp"
-            app:cardElevation="10dp">
+            app:cardElevation="10dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -155,7 +158,7 @@
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_gravity="center_horizontal"
-                    android:src="@drawable/calculator_icon"/>
+                    android:src="@drawable/icon_calc"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -163,21 +166,22 @@
                     android:textStyle="bold"
                     android:layout_marginTop="5dp"
                     android:textAlignment="center"
-                    android:text="Electricity Bill Calculator"/>
+                    android:text="Electricity Bill\nCalculator"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
+            android:id="@+id/btn_contact_board"
             android:layout_height="0dp"
             android:layout_width="0dp"
             android:backgroundTint="@color/windowBackground"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="5dp"
-            app:cardElevation="10dp">
+            app:cardElevation="10dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -188,7 +192,7 @@
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_gravity="center_horizontal"
-                    android:src="@drawable/contact_icon"/>
+                    android:src="@drawable/icon_call"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -196,33 +200,27 @@
                     android:textStyle="bold"
                     android:layout_marginTop="5dp"
                     android:textAlignment="center"
-                    android:text="Contact Electricity Board"/>
+                    android:text="Contact\nElectricity Board"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
-    </GridLayout>
-    
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:backgroundTint="@color/windowBackground"
-        app:cardElevation="10dp"
-        android:layout_height="0dp"
-        android:layout_margin="15dp"
-        android:layout_weight="2">
+    </android.support.v7.widget.GridLayout>
 
-        <GridLayout
+    <android.support.v7.widget.GridLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="2"
-            android:rowCount="1"
-            android:alignmentMode="alignMargins"
-            android:columnOrderPreserved="false">
+            android:layout_height="0dp"
+            app:columnOrderPreserved="false"
+            app:alignmentMode="alignMargins"
+            app:rowCount="1"
+        android:layout_weight="2"
+            app:columnCount="2">
 
             <LinearLayout
+                android:id="@+id/btn_status_unit"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
-                android:layout_columnWeight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                app:layout_columnWeight="1">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -238,15 +236,15 @@
                     android:textAlignment="center"
                     android:text="Days"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="5dp"
                     android:textColor="@color/colorAccent"/>
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/btn_status_days"
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
-                android:layout_columnWeight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                app:layout_columnWeight="1">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -262,10 +260,8 @@
                     android:textAlignment="center"
                     android:text="Total Charge"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="5dp"
                     android:textColor="@color/colorAccent"/>
             </LinearLayout>
-        </GridLayout>
-    </android.support.v7.widget.CardView>
+        </android.support.v7.widget.GridLayout>
 
 </LinearLayout>
