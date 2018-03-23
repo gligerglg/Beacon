@@ -43,7 +43,7 @@ public class Tarrif extends AppCompatActivity {
                     editor.putInt("threshold",Integer.parseInt(txt_units.getText().toString()));
                     editor.putBoolean("teriff_set",true);
                     editor.commit();
-                    startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                    startActivity(new Intent(getApplicationContext(),MainMenu.class));
                 }
 
             }

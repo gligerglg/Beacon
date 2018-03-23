@@ -35,7 +35,7 @@ public class SplashScreen extends AppCompatActivity {
                 finally
                 {
                     if(isTeriffSet)
-                        intent = new Intent(SplashScreen.this,MainActivity.class);
+                        intent = new Intent(SplashScreen.this,MainMenu.class);
                     else
                         intent = new Intent(SplashScreen.this,Tarrif.class);
                     startActivity(intent);
