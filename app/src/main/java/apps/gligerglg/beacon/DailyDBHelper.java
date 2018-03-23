@@ -97,7 +97,6 @@ public class DailyDBHelper extends SQLiteOpenHelper {
     public int getRecordCount(){
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE,null);
-        cursor.close();
         return cursor.getCount();
     }
 }

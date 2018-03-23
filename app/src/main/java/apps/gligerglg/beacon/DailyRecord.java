@@ -20,6 +20,12 @@ public class DailyRecord {
         this.date = date;
     }
 
+    public DailyRecord(int reading, int units, String date) {
+        this.reading = reading;
+        this.units = units;
+        this.date = date;
+    }
+
     public int getReading() {
         return reading;
     }

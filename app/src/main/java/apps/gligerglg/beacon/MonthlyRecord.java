@@ -20,6 +20,12 @@ public class MonthlyRecord {
         this.charge = charge;
     }
 
+    public MonthlyRecord(String month, int units, double charge) {
+        this.month = month;
+        this.units = units;
+        this.charge = charge;
+    }
+
     public String getMonth() {
         return month;
     }

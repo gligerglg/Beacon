@@ -13,4 +13,12 @@
         <item name="android:background">@drawable/yello_button</item>
     </style>
 
+    <style name="setting_button">
+        <item name="android:background">@drawable/square_button</item>
+    </style>
+
+    <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
 </resources>
