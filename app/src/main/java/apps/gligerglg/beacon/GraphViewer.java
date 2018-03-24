@@ -1,7 +1,5 @@
 package apps.gligerglg.beacon;
 
-import android.app.Fragment;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -11,42 +9,36 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-public class MainMenu extends AppCompatActivity {
+public class GraphViewer extends AppCompatActivity {
 
     private FrameLayout mainFrame;
     private BottomNavigationView navigationView;
-    private AboutFragment aboutFragment;
-    private FragmentSettings settingsFragment;
-    private HomeFragment homeFragment;
+    private DailyGraph dailyGraph;
+    private MonthlyGraph monthlyGraph;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_menu);
+        setContentView(R.layout.activity_graph_viewer);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        mainFrame = findViewById(R.id.main_frame);
-        navigationView = findViewById(R.id.navigation_view);
-        aboutFragment = new AboutFragment();
-        settingsFragment = new FragmentSettings();
-        homeFragment = new HomeFragment();
+        mainFrame = findViewById(R.id.graph_frame);
+        navigationView = findViewById(R.id.graph_navigation_view);
+        dailyGraph = new DailyGraph();
+        monthlyGraph = new MonthlyGraph();
 
-        setFragment(homeFragment);
+        setFragment(dailyGraph);
 
         navigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
-                    case R.id.mnu_home:
-                        setFragment(homeFragment);
+                    case R.id.mnu_daily_summery:
+                        setFragment(dailyGraph);
                         return true;
 
-                    case R.id.mnu_about:
-                        setFragment(aboutFragment);
-                        return true;
-
-                    case R.id.mnu_settings:
-                        setFragment(settingsFragment);
+                    case R.id.mnu_monthly_summery:
+                        setFragment(monthlyGraph);
                         return true;
 
                     default:
@@ -54,24 +46,17 @@ public class MainMenu extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1)
-            updateUI();
+    protected void onPause() {
+        super.onPause();
+        finish();
     }
 
     private void setFragment(android.support.v4.app.Fragment fragment){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.main_frame,fragment);
+        fragmentTransaction.replace(R.id.graph_frame,fragment);
         fragmentTransaction.commit();
     }
-
-    private void updateUI(){
-        setFragment(homeFragment);
-    }
-
 }

@@ -53,7 +53,6 @@ public class TodayReading extends AppCompatActivity {
                         Calendar calendar = Calendar.getInstance();
                         date = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH) +1) + "/" + calendar.get(Calendar.DATE);
                         dailyDBHelper.addNewRecord(new DailyRecord(today_reading,unit,date));
-                        System.out.println("Unit:" + unit + "\nReading" + today_reading);
                         startActivityForResult(new Intent(getApplicationContext(),MainMenu.class),1);
                         finish();
                     }

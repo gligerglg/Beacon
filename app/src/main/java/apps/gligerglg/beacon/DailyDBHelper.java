@@ -115,4 +115,5 @@ public class DailyDBHelper extends SQLiteOpenHelper {
         database.close();
         return record;
     }
+
 }

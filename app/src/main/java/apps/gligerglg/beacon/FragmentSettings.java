@@ -194,8 +194,12 @@ public class FragmentSettings extends Fragment{
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         units = Integer.parseInt(inputUnits.getText().toString());
+                        if(units!=0){
                         editor.putInt("threshold",units);
                         editor.commit();
+                        }
+                        else
+                            switch_unit.setChecked(false);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -224,8 +228,11 @@ public class FragmentSettings extends Fragment{
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         cycle_days = Integer.parseInt(inputDays.getText().toString());
-                        editor.putInt("cycle_days",cycle_days);
-                        editor.commit();
+                        if(cycle_days!=0) {
+                            editor.putInt("cycle_days", cycle_days);
+                            editor.commit();
+                        }else
+                            switch_date.setChecked(false);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
