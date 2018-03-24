@@ -46,11 +46,12 @@ public class DailyDBHelper extends SQLiteOpenHelper {
     public List<DailyRecord> getAllRecords()
     {
         List<DailyRecord> records = new ArrayList<>();
-        DailyRecord record = new DailyRecord();
+        DailyRecord record;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE,null);
         if(cursor.moveToFirst()){
             do{
+                record = new DailyRecord();
                 record.setId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ID))));
                 record.setDate(cursor.getString(cursor.getColumnIndex(DATE)));
                 record.setReading(Integer.parseInt(cursor.getString(cursor.getColumnIndex(READING))));
@@ -98,5 +99,20 @@ public class DailyDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getReadableDatabase();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE,null);
         return cursor.getCount();
+    }
+
+    public DailyRecord getLastRecord(){
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE,null);
+        DailyRecord record = new DailyRecord();
+
+        if(cursor.moveToLast()){
+            record.setId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ID))));
+            record.setDate(cursor.getString(cursor.getColumnIndex(DATE)));
+            record.setReading(Integer.parseInt(cursor.getString(cursor.getColumnIndex(READING))));
+            record.setUnits(Integer.parseInt(cursor.getString(cursor.getColumnIndex(UNITS))));
+        }
+        database.close();
+        return record;
     }
 }

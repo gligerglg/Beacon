@@ -228,11 +228,12 @@
                 android:orientation="vertical"
                 app:layout_columnWeight="1">
                 <TextView
+                    android:id="@+id/txt_total_days"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
                     android:text="00"
-                    android:textSize="50sp"
+                    android:textSize="30sp"
                     android:layout_gravity="center_horizontal"
                     android:textColor="@color/colorAccent"/>
 
@@ -256,7 +257,8 @@
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
                     android:text="00"
-                    android:textSize="50sp"
+                    android:id="@+id/txt_total_charge"
+                    android:textSize="30sp"
                     android:layout_gravity="center_horizontal"
                     android:textColor="@color/colorAccent"/>
 

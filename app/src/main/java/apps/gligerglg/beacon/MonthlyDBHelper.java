@@ -45,11 +45,12 @@ public class MonthlyDBHelper extends SQLiteOpenHelper {
     public List<MonthlyRecord> getAllRecords()
     {
         List<MonthlyRecord> records = new ArrayList<>();
-        MonthlyRecord record = new MonthlyRecord();
+        MonthlyRecord record;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE,null);
         if(cursor.moveToFirst()){
             do{
+                record = new MonthlyRecord();
                 record.setId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ID))));
                 record.setMonth(cursor.getString(cursor.getColumnIndex(MONTH)));
                 record.setCharge(Double.parseDouble(cursor.getString(cursor.getColumnIndex(CHARGE))));

@@ -1,6 +1,7 @@
 package apps.gligerglg.beacon;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -56,10 +57,26 @@ public class MainMenu extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1)
+            updateUI();
+    }
 
     private void setFragment(android.support.v4.app.Fragment fragment){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.main_frame,fragment);
         fragmentTransaction.commit();
+    }
+
+    private void updateUI(){
+        setFragment(homeFragment);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
     }
 }
