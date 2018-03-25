@@ -2,13 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/layout_daily_graph"
     tools:context="apps.gligerglg.beacon.DailyGraph">
 
-    <com.jjoe64.graphview.GraphView
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart_daily"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/graphview_daily"
-        android:scrollbars="horizontal"
-        android:scrollbarAlwaysDrawHorizontalTrack="true"/>
+        android:layout_height="match_parent" />
 
 </FrameLayout>

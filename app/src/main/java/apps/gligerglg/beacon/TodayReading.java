@@ -22,8 +22,8 @@ public class TodayReading extends AppCompatActivity {
     private Button btn_set_readong;
     private DailyDBHelper dailyDBHelper;
     private ConstraintLayout layout;
-
-    private int today_reading, last_reading, unit, days;
+    private SharedPreferences sharedPreferences;
+    private int today_reading, last_reading, unit, days, reading_data;
     private String date;
 
     @Override
@@ -41,11 +41,7 @@ public class TodayReading extends AppCompatActivity {
                     setMessage("Please Insert Today Reading!");
                 else {
                     today_reading = Integer.parseInt(txt_today_reading.getText().toString());
-
-                    if(days==0)
-                        unit=0;
-                    else
-                        unit = today_reading - last_reading;
+                    unit = today_reading - last_reading;
 
                     if(unit<0)
                         setMessage("Invalid Meter Reading");
@@ -56,8 +52,6 @@ public class TodayReading extends AppCompatActivity {
                         startActivityForResult(new Intent(getApplicationContext(),MainMenu.class),1);
                         finish();
                     }
-
-
 
                 }
             }
@@ -73,6 +67,10 @@ public class TodayReading extends AppCompatActivity {
             last_reading = lastRecord.getReading();
             txt_prev_reading.setText("" + last_reading);
         }
+        else if(reading_data!=0){
+            last_reading = reading_data;
+            txt_prev_reading.setText("" + last_reading);
+        }
         else
             txt_prev_reading.setText("-------");
     }
@@ -82,6 +80,9 @@ public class TodayReading extends AppCompatActivity {
         txt_today_reading = findViewById(R.id.txt_today_reading);
         btn_set_readong = findViewById(R.id.btn_today_reading);
         layout = findViewById(R.id.layout_today);
+
+        sharedPreferences = getSharedPreferences("beacon_settings",0);
+        reading_data = sharedPreferences.getInt("reading_data",0);
         updateUI();
     }
 

@@ -2,37 +2,45 @@ package apps.gligerglg.beacon;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
-import com.jjoe64.graphview.helper.StaticLabelsFormatter;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.HorizontalBarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.EntryXComparator;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class DailyGraph extends Fragment {
-    private final Handler mHandler = new Handler();
-    private Runnable mTimer1;
-    private Runnable mTimer2;
-    private GraphView graph;
+
     private Context context;
     private DailyDBHelper dailyDBHelper;
-    private LineGraphSeries<DataPoint> dataSeries;
+    private LineChart lineChart;
+    private int total_units, threshold_unit, iterator;
+    private SharedPreferences sharedPreferences;
+    private LineData lineData;
+    private FrameLayout layout;
+    private ArrayList<String> dates;
 
     public DailyGraph() {
         // Required empty public constructor
@@ -45,59 +53,136 @@ public class DailyGraph extends Fragment {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_daily_graph, container, false);
         context = getActivity();
+
+        lineChart = root.findViewById(R.id.chart_daily);
+        layout = root.findViewById(R.id.layout_daily_graph);
         dailyDBHelper = new DailyDBHelper(context);
-        graph = root.findViewById(R.id.graphview_daily);
-        dataSeries = new LineGraphSeries<>(getData());
-        dataSeries.setColor(Color.YELLOW);
-        dataSeries.setBackgroundColor(Color.YELLOW);
-        dataSeries.setDrawDataPoints(true);
-        dataSeries.setDataPointsRadius(12);
+        sharedPreferences = getActivity().getSharedPreferences("beacon_settings", 0);
+        threshold_unit = sharedPreferences.getInt("threshold",0);
 
-        dataSeries.setDrawBackground(true);
+        if(dailyDBHelper.getRecordCount()>0)
+            drawChart();
 
-        graph.getViewport().setScalable(true);
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getGridLabelRenderer().setHumanRounding(false);
-        graph.addSeries(dataSeries);
+        lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                setMessage(e.getY() + " Units have Consumed on " + dates.get((int)e.getX()));
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
 
         return root;
     }
 
-    private DataPoint[] getData(){
-        int count = dailyDBHelper.getRecordCount();
+    private void generateNormalData(){
+        iterator=0;
+        List<Entry> entries = new ArrayList<>();
         List<DailyRecord> recordList = dailyDBHelper.getAllRecords();
-        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
-        String[] dates = new String[count];
-        DataPoint[] values = new DataPoint[count];
-        int i=0;
-        for(DailyRecord record : recordList){
-                values[i] = new DataPoint(record.getReading(),record.getUnits());
-                dates[i] = record.getDate();
-                i++;
+        for(DailyRecord record : recordList) {
+            entries.add(new Entry(iterator, record.getUnits()));
+            iterator++;
         }
-        //staticLabelsFormatter.setHorizontalLabels(dates);
-        //graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
-        return values;
+
+        LineDataSet dataSet = new LineDataSet(entries,"Daily Electricity Consumption");
+
+        dataSet.setColor(Color.YELLOW);
+        dataSet.setDrawFilled(true);
+        dataSet.setFillColor(Color.YELLOW);
+        dataSet.setValueTextColor(Color.YELLOW);
+        dataSet.setCircleColor(Color.YELLOW);
+        dataSet.setCircleColorHole(Color.TRANSPARENT);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        lineData = new LineData(dataSet);
     }
 
-   /* @Override
-    public void onResume() {
-        super.onResume();
-        mTimer1 = new Runnable() {
-            @Override
-            public void run() {
-                dataSeries.resetData(getData());
-                mHandler.postDelayed(this, 300);
+    private void thresholdDataGenerator(){
+        total_units = 0;
+        iterator=0;
+
+        List<Entry> entries_lower = new ArrayList<>();
+        List<Entry> entries_higher = new ArrayList<>();
+        Entry extra_entry = null;
+        List<DailyRecord> recordList = dailyDBHelper.getAllRecords();
+
+            for (DailyRecord record : recordList) {
+                total_units += record.getUnits();
+                iterator++;
+
+                if (total_units >= threshold_unit) {
+                    if (extra_entry != null) {
+                        entries_higher.add(extra_entry);
+                        extra_entry = null;
+                    }
+                    entries_higher.add(new Entry(iterator, record.getUnits()));
+                } else {
+                    extra_entry = new Entry(iterator, record.getUnits());
+                    entries_lower.add(extra_entry);
+                }
             }
-        };
-        mHandler.postDelayed(mTimer1, 300);
 
+
+        LineDataSet dataSet_lower = new LineDataSet(entries_lower,"Electricity Consumption Under Threshold Limit");
+        LineDataSet dataSet_higer = new LineDataSet(entries_higher,"Electricity Consumption Over Threshold Limit");
+
+        //Lower Data Style
+        dataSet_lower.setColor(Color.YELLOW);
+        dataSet_lower.setDrawFilled(true);
+        dataSet_lower.setFillColor(Color.YELLOW);
+        dataSet_lower.setValueTextColor(Color.YELLOW);
+        dataSet_lower.setCircleColor(Color.YELLOW);
+        dataSet_lower.setCircleColorHole(Color.TRANSPARENT);
+        dataSet_lower.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+        //Higher Data Style
+        dataSet_higer.setColor(Color.RED);
+        dataSet_higer.setDrawFilled(true);
+        dataSet_higer.setFillColor(Color.RED);
+        dataSet_higer.setValueTextColor(Color.RED);
+        dataSet_higer.setCircleColor(Color.RED);
+        dataSet_higer.setCircleColorHole(Color.TRANSPARENT);
+        dataSet_higer.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        lineData = new LineData(dataSet_lower,dataSet_higer);
     }
 
-    @Override
-    public void onPause() {
-        mHandler.removeCallbacks(mTimer1);
-        super.onPause();
-    }*/
+    private void setMessage(String message){
+        Snackbar snackbar = Snackbar.make(layout,message,Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
+    private void updateUI()
+    {
+        dates = new ArrayList<>();
+        dailyDBHelper = new DailyDBHelper(context);
+        List<DailyRecord> recordList = dailyDBHelper.getAllRecords();
+        for(DailyRecord record : recordList)
+            dates.add(record.getDate());
+    }
+
+    private void drawChart(){
+        updateUI();
+
+        if(threshold_unit==0){
+            generateNormalData();
+        }
+        else {
+            //thresholdDataGenerator();
+            generateNormalData();
+        }
+
+        lineChart.setDrawGridBackground(false);
+        lineChart.getXAxis().setEnabled(false);
+        lineChart.getAxisLeft().setEnabled(false);
+        lineChart.getAxisRight().setEnabled(false);
+
+        lineChart.getDescription().setEnabled(false);
+        lineChart.getLegend().setTextColor(Color.WHITE);
+        lineChart.getLegend().setWordWrapEnabled(true);
+        lineChart.setData(lineData);
+        lineChart.animateY(3000, Easing.EasingOption.EaseOutCirc);
+        lineChart.invalidate();
+    }
 }

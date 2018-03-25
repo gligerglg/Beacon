@@ -283,9 +283,12 @@ public class FragmentSettings extends Fragment{
                     break;
             }
 
+            editor.putInt("reading_data",dailyDBHelper.getLastRecord().getReading());
+            editor.commit();
             MonthlyRecord monthlyRecord = new MonthlyRecord(month, units, charge);
             monthlyDBHelper.addNewRecord(monthlyRecord);
             dailyDBHelper.deleteAllRecords();
+            setMessage("Your daily records are refreshed.\nCurrent month data added to database successfully");
         }
         else
             setMessage("There is no Data in Database!");

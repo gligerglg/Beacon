@@ -6,4 +6,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about_desc">\tThe most important measure in the energy balance of Sri Lanka is the total consumption of 11.72 billion kWh
+per year. Beacon is the best tool to monitor your daily electricity consumption and conserve energy. Using Beacon we are able to\n\n\tRecord Daily Electricity Consumption
+    \n\tRecord Monthly Electricity Consumption\n\tCalculate Electricity Bill\n\tAutomate Beacon using Threshold Unit\n\tAnalyze Consumption Summery using Graphs\n</string>
 </resources>

@@ -45,6 +45,7 @@ public class HomeFragment extends Fragment {
     private MonthlyDBHelper monthlyDBHelper;
     private String category;
     private FrameLayout layout;
+    private SharedPreferences.Editor editor;
 
     private boolean isBeaconActive = false;
     private double critical_ratio = 0;
@@ -81,8 +82,10 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 if(isReadingMarked())
                     setMessage("You have already read the Meter!");
-                else
-                    startActivity(new Intent(context,TodayReading.class));
+                else {
+                    startActivity(new Intent(context, TodayReading.class));
+                    getActivity().finish();
+                }
             }
         });
 
@@ -120,6 +123,7 @@ public class HomeFragment extends Fragment {
     private void Init()
     {
         sharedPreferences = getActivity().getSharedPreferences("beacon_settings", 0);
+        editor = sharedPreferences.edit();
         category = sharedPreferences.getString("category","");
         threshold_unit = sharedPreferences.getInt("threshold",0);
         cycle_date = sharedPreferences.getInt("cycle_days",0);
@@ -139,11 +143,6 @@ public class HomeFragment extends Fragment {
             txt_total_charge.setText("00");
             txt_total_days.setText("00");
         }
-        else if(total_days==1){
-            txt_units.setText("--");
-            txt_total_charge.setText("" + calcCharge());
-            txt_total_days.setText("1");
-        }
         else {
             List<DailyRecord> recordList = dailyDBHelper.getAllRecords();
             for(DailyRecord record : recordList){
@@ -159,16 +158,27 @@ public class HomeFragment extends Fragment {
 
         //Handle Settings
         if(threshold_unit!=0 && cycle_date!=0){
-            critical_ratio = (total_units/total_days) * cycle_date;
-            if(critical_ratio>=threshold_unit){
-                if(total_units>=threshold_unit)
-                    bracon_message = "You have already exceeded threshold unit limit";
-                else
-                    bracon_message = "Your threshold limit is can be exceeded. Reduce your power consumption";
-                Glide.with(getActivity()).asGif().load(R.drawable.beacon).into(img_beacon);
-                isBeaconActive = true;
+            if(total_days==cycle_date){
+                resetMonth();
+                txt_units.setText("00");
+                txt_total_charge.setText("00");
+                txt_total_days.setText("00");
             }
-            else {
+            try {
+                critical_ratio = (total_units / total_days) * cycle_date;
+                if (critical_ratio >= threshold_unit) {
+                    if (total_units >= threshold_unit)
+                        bracon_message = "You have already exceeded threshold unit limit";
+                    else
+                        bracon_message = "Your threshold limit is can be exceeded. Reduce your power consumption";
+                    Glide.with(getActivity()).asGif().load(R.drawable.beacon).into(img_beacon);
+                    isBeaconActive = true;
+                } else {
+                    Glide.with(getActivity()).asBitmap().load(R.drawable.beacon_green).into(img_beacon);
+                    isBeaconActive = false;
+                    bracon_message = "Your power consumption is normal";
+                }
+            }catch (Exception e){
                 Glide.with(getActivity()).asBitmap().load(R.drawable.beacon_green).into(img_beacon);
                 isBeaconActive = false;
                 bracon_message = "Your power consumption is normal";
@@ -189,11 +199,12 @@ public class HomeFragment extends Fragment {
         else if(threshold_unit==0 && cycle_date!=0){
             if(total_days==cycle_date){
                 resetMonth();
+                txt_units.setText("00");
+                txt_total_charge.setText("00");
+                txt_total_days.setText("00");
             }
-            else {
-                Glide.with(getActivity()).asBitmap().load(R.drawable.beacon_deactivate).into(img_beacon);
-                bracon_message = "Your bill will be automatically refreshed";
-            }
+            Glide.with(getActivity()).asBitmap().load(R.drawable.beacon_yellow).into(img_beacon);
+            bracon_message = "Your bill will be automatically refreshed";
         }
         else {
             Glide.with(getActivity()).asBitmap().load(R.drawable.beacon_deactivate).into(img_beacon);
@@ -230,18 +241,26 @@ public class HomeFragment extends Fragment {
     }
 
     private boolean isReadingMarked(){
-        boolean chacked = true;
+        boolean chacked = false;
         dailyDBHelper = new DailyDBHelper(context);
+        Calendar nowcalender = Calendar.getInstance();
+        Calendar taskcalendar = Calendar.getInstance();
         if(dailyDBHelper.getRecordCount()==0)
             chacked = false;
         else {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
             try {
                 Date dbDate = sdf.parse(dailyDBHelper.getLastRecord().getDate());
-                if (new Date().equals(dbDate))
-                    chacked = false;
-                else
+                taskcalendar.setTime(dbDate);
+                if ((nowcalender.get(Calendar.YEAR)==taskcalendar.get(Calendar.YEAR))
+                        && (nowcalender.get(Calendar.MONTH)==taskcalendar.get(Calendar.MONTH))
+                && (nowcalender.get(Calendar.DATE)==taskcalendar.get(Calendar.DATE))){
                     chacked = true;
+               }
+                else if(nowcalender.before(taskcalendar))
+                    chacked = true;
+                else
+                    chacked = false;
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -309,9 +328,12 @@ public class HomeFragment extends Fragment {
                     break;
             }
 
+            editor.putInt("reading_data",dailyDBHelper.getLastRecord().getReading());
+            editor.commit();
             MonthlyRecord monthlyRecord = new MonthlyRecord(month, units, charge);
             monthlyDBHelper.addNewRecord(monthlyRecord);
             dailyDBHelper.deleteAllRecords();
+            setMessage("Your daily records are refreshed.\nCurrent month data added to database successfully");
         }
         else
             setMessage("There is no Data in Database!");
