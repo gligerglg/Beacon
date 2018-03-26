@@ -23,7 +23,7 @@ public class MonthlyDBHelper extends SQLiteOpenHelper {
     private static final String CHARGE = "charge";
 
     public MonthlyDBHelper(Context context) {
-        super(context, DATABASE,null, 1);
+        super(context, DATABASE,null, 2);
     }
 
     @Override
@@ -34,6 +34,7 @@ public class MonthlyDBHelper extends SQLiteOpenHelper {
                 + UNITS + " INT,"
                 + CHARGE + " DOUBLE)";
         sqLiteDatabase.execSQL(sql);
+        System.out.println(TABLE + " is created!");
     }
 
     @Override

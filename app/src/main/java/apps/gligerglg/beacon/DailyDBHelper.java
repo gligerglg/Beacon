@@ -23,8 +23,9 @@ public class DailyDBHelper extends SQLiteOpenHelper {
     private static final String UNITS = "units";
     private static final String DATE = "date";
 
+
     public DailyDBHelper(Context context) {
-        super(context, DATABASE, null, 1);
+        super(context, DATABASE, null, 2);
     }
 
     @Override
@@ -35,6 +36,7 @@ public class DailyDBHelper extends SQLiteOpenHelper {
                 + UNITS + " INT,"
                 + DATE + " TEXT)";
         sqLiteDatabase.execSQL(sql);
+        System.out.println(TABLE + " is created!");
     }
 
     @Override

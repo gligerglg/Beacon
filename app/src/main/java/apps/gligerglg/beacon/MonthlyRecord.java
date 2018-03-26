@@ -3,7 +3,6 @@ package apps.gligerglg.beacon;
 /**
  * Created by Gayan Lakshitha on 3/23/2018.
  */
-
 public class MonthlyRecord {
     private int id;
     private String month;

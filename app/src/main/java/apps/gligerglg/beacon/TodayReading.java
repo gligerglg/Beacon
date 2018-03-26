@@ -25,6 +25,7 @@ public class TodayReading extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private int today_reading, last_reading, unit, days, reading_data;
     private String date;
+    private boolean isFirst = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +42,11 @@ public class TodayReading extends AppCompatActivity {
                     setMessage("Please Insert Today Reading!");
                 else {
                     today_reading = Integer.parseInt(txt_today_reading.getText().toString());
-                    unit = today_reading - last_reading;
+
+                    if(isFirst)
+                        unit = 0;
+                    else
+                        unit = today_reading - last_reading;
 
                     if(unit<0)
                         setMessage("Invalid Meter Reading");
@@ -65,14 +70,18 @@ public class TodayReading extends AppCompatActivity {
         days = dailyDBHelper.getRecordCount();
         if(lastRecord.getReading()!=0) {
             last_reading = lastRecord.getReading();
+            isFirst = false;
             txt_prev_reading.setText("" + last_reading);
         }
         else if(reading_data!=0){
             last_reading = reading_data;
+            isFirst = false;
             txt_prev_reading.setText("" + last_reading);
         }
-        else
+        else {
+            isFirst = true;
             txt_prev_reading.setText("-------");
+        }
     }
 
     private void Init(){

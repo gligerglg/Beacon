@@ -75,17 +75,24 @@ public class HomeFragment extends Fragment {
         txt_total_days = rootView.findViewById(R.id.txt_total_days);
         layout = rootView.findViewById(R.id.layout_home);
 
+        monthlyDBHelper = new MonthlyDBHelper(context);
+        dailyDBHelper = new DailyDBHelper(context);
+
+
         Init();
 
         btn_meter_reader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isReadingMarked())
+                /*if(isReadingMarked())
                     setMessage("You have already read the Meter!");
                 else {
                     startActivity(new Intent(context, TodayReading.class));
                     getActivity().finish();
-                }
+                }*/
+
+                startActivity(new Intent(context, TodayReading.class));
+                getActivity().finish();
             }
         });
 
@@ -135,8 +142,7 @@ public class HomeFragment extends Fragment {
         total_days = 0;
         total_units = 0;
         total_charge = 0;
-        dailyDBHelper = new DailyDBHelper(context);
-        monthlyDBHelper = new MonthlyDBHelper(context);
+
         total_days = dailyDBHelper.getRecordCount();
         if(total_days==0){
             txt_units.setText("00");
