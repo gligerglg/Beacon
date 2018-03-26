@@ -21,7 +21,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" tools:targetApi="lollipop">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorAccent"
-                android:text="Consumer Tariff Category"
+                android:text="@string/consumer_tariff_category"
                 android:textAllCaps="false" />
 
             <RadioGroup
@@ -41,13 +41,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp">
+                android:layout_marginLeft="10dp" android:layout_marginStart="10dp">
 
                 <RadioButton
                     android:id="@+id/radio_domestic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Domestic"
+                    android:text="@string/domestic"
                     android:textColor="@color/colorTextColor"
                     />
 
@@ -55,7 +55,7 @@
                     android:id="@+id/radio_religious"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Religious"
+                    android:text="@string/religious"
                     android:textColor="@color/colorTextColor"
                     />
 
@@ -63,7 +63,7 @@
                     android:id="@+id/radio_general"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="General Purpose"
+                    android:text="@string/general_purpose"
                     android:textColor="@color/colorTextColor"
                     />
 
@@ -71,7 +71,7 @@
                     android:id="@+id/radio_hotel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hotel"
+                    android:text="@string/hotel"
                     android:textColor="@color/colorTextColor"
                     />
 
@@ -79,7 +79,7 @@
                     android:id="@+id/radio_industrial"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Industrial"
+                    android:text="@string/industrial"
                     android:textColor="@color/colorTextColor"
                     />
             </RadioGroup>
@@ -91,7 +91,7 @@
                 android:layout_marginTop="20dp"
                 style="@style/beacon_button"
                 android:textColor="#000"
-                android:text="Start Beacon"
+                android:text="@string/start_beacon"
                 android:id="@+id/btn_done"
                 android:textAllCaps="false" />
         </LinearLayout>

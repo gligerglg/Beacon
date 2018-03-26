@@ -1,6 +1,7 @@
 package apps.gligerglg.beacon;
 
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -34,7 +35,7 @@ import java.util.List;
 public class DailyGraph extends Fragment {
 
     private Context context;
-    private DailyDBHelper dailyDBHelper;
+    private BeaconDB beaconDB;
     private LineChart lineChart;
     private int total_units, threshold_unit, iterator;
     private SharedPreferences sharedPreferences;
@@ -56,11 +57,12 @@ public class DailyGraph extends Fragment {
 
         lineChart = root.findViewById(R.id.chart_daily);
         layout = root.findViewById(R.id.layout_daily_graph);
-        dailyDBHelper = new DailyDBHelper(context);
+        beaconDB = Room.databaseBuilder(context,BeaconDB.class,"BeaconDB").fallbackToDestructiveMigration()
+                .allowMainThreadQueries().build();
         sharedPreferences = getActivity().getSharedPreferences("beacon_settings", 0);
         threshold_unit = sharedPreferences.getInt("threshold",0);
 
-        if(dailyDBHelper.getRecordCount()>0)
+        if(beaconDB.dailyDAO().getRecordCount()>0)
             drawChart();
 
         lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
@@ -81,7 +83,7 @@ public class DailyGraph extends Fragment {
     private void generateNormalData(){
         iterator=0;
         List<Entry> entries = new ArrayList<>();
-        List<DailyRecord> recordList = dailyDBHelper.getAllRecords();
+        List<DailyRecord> recordList = beaconDB.dailyDAO().getAllRecords();
         for(DailyRecord record : recordList) {
             entries.add(new Entry(iterator, record.getUnits()));
             iterator++;
@@ -106,7 +108,7 @@ public class DailyGraph extends Fragment {
         List<Entry> entries_lower = new ArrayList<>();
         List<Entry> entries_higher = new ArrayList<>();
         Entry extra_entry = null;
-        List<DailyRecord> recordList = dailyDBHelper.getAllRecords();
+        List<DailyRecord> recordList = beaconDB.dailyDAO().getAllRecords();
 
             for (DailyRecord record : recordList) {
                 total_units += record.getUnits();
@@ -156,8 +158,7 @@ public class DailyGraph extends Fragment {
     private void updateUI()
     {
         dates = new ArrayList<>();
-        dailyDBHelper = new DailyDBHelper(context);
-        List<DailyRecord> recordList = dailyDBHelper.getAllRecords();
+        List<DailyRecord> recordList = beaconDB.dailyDAO().getAllRecords();
         for(DailyRecord record : recordList)
             dates.add(record.getDate());
     }

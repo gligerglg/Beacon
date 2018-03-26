@@ -2,6 +2,7 @@ package apps.gligerglg.beacon;
 
 
 import android.app.AlarmManager;
+import android.arch.persistence.room.Room;
 import android.support.v4.app.DialogFragment;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -42,8 +43,7 @@ public class FragmentSettings extends Fragment{
     private int units, cycle_days;
     private FrameLayout layout;
     private Context context;
-    private DailyDBHelper dailyDBHelper;
-    private MonthlyDBHelper monthlyDBHelper;
+    private BeaconDB beaconDB;
     private String category;
 
     String[]monthName={"January","February","March", "April", "May", "June", "July",
@@ -131,8 +131,8 @@ public class FragmentSettings extends Fragment{
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                dailyDBHelper.deleteAllRecords();
-                                monthlyDBHelper.deleteAllRecords();
+                                beaconDB.dailyDAO().deleteAllRecords();
+                                beaconDB.monthlyDAO().deleteAllRecords();
                                 setMessage("All Data Erased Successfully!");
                             }
                         })
@@ -159,8 +159,9 @@ public class FragmentSettings extends Fragment{
         category = sharedPreferences.getString("category","");
 
         //Initialize DB helpers
-        dailyDBHelper = new DailyDBHelper(context);
-        monthlyDBHelper = new MonthlyDBHelper(context);
+        beaconDB = Room.databaseBuilder(context,BeaconDB.class,"BeaconDB").fallbackToDestructiveMigration()
+                .allowMainThreadQueries()
+                .build();
 
         //Set CycleDay Switch
         cycle_days = sharedPreferences.getInt("cycle_days",0);
@@ -253,10 +254,10 @@ public class FragmentSettings extends Fragment{
     }
     private void resetMonth()
     {
-        if(dailyDBHelper.getRecordCount()!=0) {
-            List<DailyRecord> dailyRecordList = dailyDBHelper.getAllRecords();
+        if(beaconDB.dailyDAO().getRecordCount()!=0) {
+            List<DailyRecord> dailyRecordList = beaconDB.dailyDAO().getAllRecords();
             int units = 0;
-            int days = dailyDBHelper.getRecordCount();
+            int days = beaconDB.dailyDAO().getRecordCount();
             for (DailyRecord record : dailyRecordList)
                 units += record.getUnits();
 
@@ -283,16 +284,23 @@ public class FragmentSettings extends Fragment{
                     break;
             }
 
-            editor.putInt("reading_data",dailyDBHelper.getLastRecord().getReading());
+            editor.putInt("reading_data",getLastRecord().getReading());
             editor.commit();
             MonthlyRecord monthlyRecord = new MonthlyRecord(month, units, charge);
-            monthlyDBHelper.addNewRecord(monthlyRecord);
-            dailyDBHelper.deleteAllRecords();
+            beaconDB.monthlyDAO().addNewRecord(monthlyRecord);
+            beaconDB.dailyDAO().deleteAllRecords();
             setMessage("Your daily records are refreshed.\nCurrent month data added to database successfully");
         }
         else
             setMessage("There is no Data in Database!");
     }
 
+    private DailyRecord getLastRecord(){
+        DailyRecord record = null;
+        List<DailyRecord> recordList = beaconDB.dailyDAO().getAllRecords();
+        for(DailyRecord dailyRecord : recordList)
+            record = dailyRecord;
+        return record;
+    }
 
 }

@@ -2,6 +2,7 @@ package apps.gligerglg.beacon;
 
 
 import android.app.AlertDialog;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,8 +42,7 @@ public class HomeFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private int total_units=0, total_days=0, threshold_unit=0, cycle_date=0;
     private double total_charge=0;
-    private DailyDBHelper dailyDBHelper;
-    private MonthlyDBHelper monthlyDBHelper;
+    private BeaconDB beaconDB;
     private String category;
     private FrameLayout layout;
     private SharedPreferences.Editor editor;
@@ -75,8 +75,8 @@ public class HomeFragment extends Fragment {
         txt_total_days = rootView.findViewById(R.id.txt_total_days);
         layout = rootView.findViewById(R.id.layout_home);
 
-        monthlyDBHelper = new MonthlyDBHelper(context);
-        dailyDBHelper = new DailyDBHelper(context);
+        beaconDB = Room.databaseBuilder(context,BeaconDB.class,"BeaconDB").fallbackToDestructiveMigration()
+                .allowMainThreadQueries().build();
 
 
         Init();
@@ -84,15 +84,12 @@ public class HomeFragment extends Fragment {
         btn_meter_reader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*if(isReadingMarked())
+                if(isReadingMarked())
                     setMessage("You have already read the Meter!");
                 else {
                     startActivity(new Intent(context, TodayReading.class));
                     getActivity().finish();
-                }*/
-
-                startActivity(new Intent(context, TodayReading.class));
-                getActivity().finish();
+                }
             }
         });
 
@@ -143,14 +140,14 @@ public class HomeFragment extends Fragment {
         total_units = 0;
         total_charge = 0;
 
-        total_days = dailyDBHelper.getRecordCount();
+        total_days = beaconDB.dailyDAO().getRecordCount();
         if(total_days==0){
             txt_units.setText("00");
             txt_total_charge.setText("00");
             txt_total_days.setText("00");
         }
         else {
-            List<DailyRecord> recordList = dailyDBHelper.getAllRecords();
+            List<DailyRecord> recordList = beaconDB.dailyDAO().getAllRecords();
             for(DailyRecord record : recordList){
                 total_units += record.getUnits();
             }
@@ -248,15 +245,14 @@ public class HomeFragment extends Fragment {
 
     private boolean isReadingMarked(){
         boolean chacked = false;
-        dailyDBHelper = new DailyDBHelper(context);
         Calendar nowcalender = Calendar.getInstance();
         Calendar taskcalendar = Calendar.getInstance();
-        if(dailyDBHelper.getRecordCount()==0)
+        if(beaconDB.dailyDAO().getRecordCount()==0)
             chacked = false;
         else {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
             try {
-                Date dbDate = sdf.parse(dailyDBHelper.getLastRecord().getDate());
+                Date dbDate = sdf.parse(getLastRecord().getDate());
                 taskcalendar.setTime(dbDate);
                 if ((nowcalender.get(Calendar.YEAR)==taskcalendar.get(Calendar.YEAR))
                         && (nowcalender.get(Calendar.MONTH)==taskcalendar.get(Calendar.MONTH))
@@ -304,10 +300,10 @@ public class HomeFragment extends Fragment {
 
     private void resetMonth()
     {
-        if(dailyDBHelper.getRecordCount()!=0) {
-            List<DailyRecord> dailyRecordList = dailyDBHelper.getAllRecords();
+        if(beaconDB.dailyDAO().getRecordCount()!=0) {
+            List<DailyRecord> dailyRecordList = beaconDB.dailyDAO().getAllRecords();
             int units = 0;
-            int days = dailyDBHelper.getRecordCount();
+            int days = beaconDB.dailyDAO().getRecordCount();
             for (DailyRecord record : dailyRecordList)
                 units += record.getUnits();
 
@@ -334,14 +330,22 @@ public class HomeFragment extends Fragment {
                     break;
             }
 
-            editor.putInt("reading_data",dailyDBHelper.getLastRecord().getReading());
+            editor.putInt("reading_data",getLastRecord().getReading());
             editor.commit();
             MonthlyRecord monthlyRecord = new MonthlyRecord(month, units, charge);
-            monthlyDBHelper.addNewRecord(monthlyRecord);
-            dailyDBHelper.deleteAllRecords();
+            beaconDB.monthlyDAO().addNewRecord(monthlyRecord);
+            beaconDB.dailyDAO().deleteAllRecords();
             setMessage("Your daily records are refreshed.\nCurrent month data added to database successfully");
         }
         else
             setMessage("There is no Data in Database!");
+    }
+
+    private DailyRecord getLastRecord(){
+        DailyRecord record = null;
+        List<DailyRecord> recordList = beaconDB.dailyDAO().getAllRecords();
+        for(DailyRecord dailyRecord : recordList)
+            record = dailyRecord;
+        return record;
     }
 }

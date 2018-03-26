@@ -9,7 +9,8 @@ import android.view.WindowManager;
 public class SplashScreen extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
-    private boolean isTeriffSet;
+    private SharedPreferences.Editor editor;
+    private boolean isFirsttime = true;
     private Intent intent;
 
     @Override
@@ -18,7 +19,8 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         sharedPreferences = getSharedPreferences("beacon_settings",0);
-        isTeriffSet = sharedPreferences.getBoolean("teriff_set",false);
+        editor= sharedPreferences.edit();
+        isFirsttime = sharedPreferences.getBoolean("intro", true);
 
         Thread timerThread = new Thread()
         {
@@ -34,10 +36,13 @@ public class SplashScreen extends AppCompatActivity {
                 }
                 finally
                 {
-                    if(isTeriffSet)
-                        intent = new Intent(SplashScreen.this,MainMenu.class);
+                    if(isFirsttime) {
+                        intent = new Intent(SplashScreen.this, Intro.class);
+                        editor.putBoolean("intro",false);
+                        editor.commit();
+                    }
                     else
-                        intent = new Intent(SplashScreen.this,Tarrif.class);
+                        intent = new Intent(SplashScreen.this,MainMenu.class);
                     startActivity(intent);
                 }
             }

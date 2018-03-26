@@ -37,7 +37,6 @@ public class Tarrif extends AppCompatActivity {
             public void onClick(View view) {
                radioButton = findViewById(radioGroup.getCheckedRadioButtonId());
                     editor.putString("category",radioButton.getText().toString());
-                    editor.putBoolean("teriff_set",true);
                     editor.commit();
                     startActivity(new Intent(getApplicationContext(),MainMenu.class));
 

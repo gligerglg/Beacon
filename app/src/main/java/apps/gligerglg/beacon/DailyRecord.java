@@ -1,18 +1,29 @@
 package apps.gligerglg.beacon;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+
 /**
  * Created by Gayan Lakshitha on 3/23/2018.
  */
-
+@Entity(tableName = "BeaconTBL_Daily")
 public class DailyRecord {
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     private int id;
+    @ColumnInfo(name = "reading")
     private int reading;
+    @ColumnInfo(name = "units")
     private int units;
+    @ColumnInfo(name = "date")
     private String date;
 
     public DailyRecord() {
     }
 
+    @Ignore
     public DailyRecord(int id, int reading, int units, String date) {
         this.id = id;
         this.reading = reading;
@@ -20,6 +31,7 @@ public class DailyRecord {
         this.date = date;
     }
 
+    @Ignore
     public DailyRecord(int reading, int units, String date) {
         this.reading = reading;
         this.units = units;

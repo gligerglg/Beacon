@@ -1,5 +1,6 @@
 package apps.gligerglg.beacon;
 
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.constraint.ConstraintLayout;
@@ -14,13 +15,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class TodayReading extends AppCompatActivity {
 
     private TextView txt_prev_reading;
     private EditText txt_today_reading;
     private Button btn_set_readong;
-    private DailyDBHelper dailyDBHelper;
+    private BeaconDB beaconDB;
     private ConstraintLayout layout;
     private SharedPreferences sharedPreferences;
     private int today_reading, last_reading, unit, days, reading_data;
@@ -53,7 +55,7 @@ public class TodayReading extends AppCompatActivity {
                     else {
                         Calendar calendar = Calendar.getInstance();
                         date = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH) +1) + "/" + calendar.get(Calendar.DATE);
-                        dailyDBHelper.addNewRecord(new DailyRecord(today_reading,unit,date));
+                        beaconDB.dailyDAO().addNewRecord(new DailyRecord(today_reading,unit,date));
                         startActivityForResult(new Intent(getApplicationContext(),MainMenu.class),1);
                         finish();
                     }
@@ -65,10 +67,12 @@ public class TodayReading extends AppCompatActivity {
 
     private void updateUI()
     {
-        dailyDBHelper = new DailyDBHelper(getApplicationContext());
-        DailyRecord lastRecord = dailyDBHelper.getLastRecord();
-        days = dailyDBHelper.getRecordCount();
-        if(lastRecord.getReading()!=0) {
+        beaconDB = Room.databaseBuilder(getApplicationContext(),BeaconDB.class,"BeaconDB").fallbackToDestructiveMigration()
+                .allowMainThreadQueries()
+                .build();
+        DailyRecord lastRecord = getLastRecord();
+        days = beaconDB.dailyDAO().getRecordCount();
+        if(lastRecord!=null) {
             last_reading = lastRecord.getReading();
             isFirst = false;
             txt_prev_reading.setText("" + last_reading);
@@ -110,5 +114,13 @@ public class TodayReading extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         startActivityForResult(new Intent(getApplicationContext(),MainMenu.class),1);
+    }
+
+    private DailyRecord getLastRecord(){
+        DailyRecord record = null;
+        List<DailyRecord> recordList = beaconDB.dailyDAO().getAllRecords();
+        for(DailyRecord dailyRecord : recordList)
+            record = dailyRecord;
+        return record;
     }
 }
