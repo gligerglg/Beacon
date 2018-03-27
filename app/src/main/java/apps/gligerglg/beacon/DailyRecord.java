@@ -19,23 +19,35 @@ public class DailyRecord {
     private int units;
     @ColumnInfo(name = "date")
     private String date;
+    @ColumnInfo(name = "days")
+    private int days;
 
     public DailyRecord() {
     }
 
     @Ignore
-    public DailyRecord(int id, int reading, int units, String date) {
+    public DailyRecord(int id, int reading, int units, String date, int days) {
         this.id = id;
         this.reading = reading;
         this.units = units;
         this.date = date;
+        this.days = days;
     }
 
     @Ignore
-    public DailyRecord(int reading, int units, String date) {
+    public DailyRecord(int reading, int units, String date, int days) {
         this.reading = reading;
         this.units = units;
         this.date = date;
+        this.days = days;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public void setDays(int days) {
+        this.days = days;
     }
 
     public int getReading() {

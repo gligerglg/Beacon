@@ -22,4 +22,7 @@ public interface DailyDAO {
 
     @Query("SELECT COUNT(*) FROM BeaconTBL_Daily")
     int getRecordCount();
+
+    @Query("SELECT SUM(days) FROM BeaconTBL_Daily")
+    int getTotalDays();
 }

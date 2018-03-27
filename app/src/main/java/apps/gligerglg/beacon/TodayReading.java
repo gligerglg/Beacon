@@ -14,8 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class TodayReading extends AppCompatActivity {
 
@@ -25,9 +29,10 @@ public class TodayReading extends AppCompatActivity {
     private BeaconDB beaconDB;
     private ConstraintLayout layout;
     private SharedPreferences sharedPreferences;
-    private int today_reading, last_reading, unit, days, reading_data;
+    private int today_reading, last_reading, unit, days, reading_data, days_last;
     private String date;
     private boolean isFirst = false;
+    private DailyRecord lastRecord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +60,8 @@ public class TodayReading extends AppCompatActivity {
                     else {
                         Calendar calendar = Calendar.getInstance();
                         date = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH) +1) + "/" + calendar.get(Calendar.DATE);
-                        beaconDB.dailyDAO().addNewRecord(new DailyRecord(today_reading,unit,date));
+                        days_last = calcDays();
+                        beaconDB.dailyDAO().addNewRecord(new DailyRecord(today_reading,unit,date,days_last));
                         startActivityForResult(new Intent(getApplicationContext(),MainMenu.class),1);
                         finish();
                     }
@@ -70,8 +76,8 @@ public class TodayReading extends AppCompatActivity {
         beaconDB = Room.databaseBuilder(getApplicationContext(),BeaconDB.class,"BeaconDB").fallbackToDestructiveMigration()
                 .allowMainThreadQueries()
                 .build();
-        DailyRecord lastRecord = getLastRecord();
-        days = beaconDB.dailyDAO().getRecordCount();
+        lastRecord = getLastRecord();
+        days = beaconDB.dailyDAO().getTotalDays();
         if(lastRecord!=null) {
             last_reading = lastRecord.getReading();
             isFirst = false;
@@ -122,5 +128,22 @@ public class TodayReading extends AppCompatActivity {
         for(DailyRecord dailyRecord : recordList)
             record = dailyRecord;
         return record;
+    }
+
+    private int calcDays(){
+
+        if(beaconDB.dailyDAO().getRecordCount()==0)
+            return 1;
+        else {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+            try {
+                Date lastDate = sdf.parse(getLastRecord().getDate());
+                Date todayDate = sdf.parse(date);
+                return (int) TimeUnit.DAYS.convert(todayDate.getTime() - lastDate.getTime(),TimeUnit.MILLISECONDS);
+
+            } catch (ParseException e) {
+                return 0;
+            }
+        }
     }
 }

@@ -140,7 +140,7 @@ public class HomeFragment extends Fragment {
         total_units = 0;
         total_charge = 0;
 
-        total_days = beaconDB.dailyDAO().getRecordCount();
+        total_days = beaconDB.dailyDAO().getTotalDays();
         if(total_days==0){
             txt_units.setText("00");
             txt_total_charge.setText("00");
